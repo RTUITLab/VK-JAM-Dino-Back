@@ -1,0 +1,41 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Login to registry
+      run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login registry.rtuitlab.dev -u ${{ secrets.REGISTRY_USER }} --password-stdin
+        
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag registry.rtuitlab.dev/vk-jam-back:latest
+
+    - name: Add tags and push image
+      run: |
+        docker tag $IMAGE_NAME $IMAGE_NAME:latest
+        docker tag $IMAGE_NAME $IMAGE_NAME:${{ github.run_number }}
+        docker push $IMAGE_NAME:latest
+        docker push $IMAGE_NAME:${{ github.run_number }}
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Login to registry
+      run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login registry.rtuitlab.dev -u ${{ secrets.REGISTRY_USER }} --password-stdin
+    - name: Update service
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_PASSWORD }}
+        script: |
+          docker service update --with-registry-auth --image=registry.rtuitlab.dev/vk-jam-back vk-jam
+  

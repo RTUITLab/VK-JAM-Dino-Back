@@ -2,6 +2,7 @@ from fastapi import APIRouter, WebSocket, Query
 from uuid import uuid1
 from random import Random
 from datetime import datetime
+from ..db import db
 
 
 current_room = uuid1()
@@ -18,6 +19,11 @@ run_router = APIRouter()
 
 async def start_run(room_id):
     seed = rand.randint(1, 900)
+    db.runs.insert_one({
+        "room_id": room_id,
+        "seed": seed,
+        "finished": False
+    })
     for user in runs[room_id]["users"]:
         connection = connections[user["conn"]]
         if user["alive"]:

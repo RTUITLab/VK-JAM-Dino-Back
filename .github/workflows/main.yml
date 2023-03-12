@@ -19,10 +19,10 @@ jobs:
 
     - name: Add tags and push image
       run: |
-        docker tag $IMAGE_NAME $IMAGE_NAME:latest
-        docker tag $IMAGE_NAME $IMAGE_NAME:${{ github.run_number }}
-        docker push $IMAGE_NAME:latest
-        docker push $IMAGE_NAME:${{ github.run_number }}
+        docker tag registry.rtuitlab.dev/vk-jam-back registry.rtuitlab.dev/vk-jam-back:latest
+        docker tag registry.rtuitlab.dev/vk-jam-back registry.rtuitlab.dev/vk-jam-back:${{ github.run_number }}
+        docker push registry.rtuitlab.dev/vk-jam-back:latest
+        docker push registry.rtuitlab.dev/vk-jam-back:${{ github.run_number }}
   deploy:
     needs: [build]
     runs-on: ubuntu-latest

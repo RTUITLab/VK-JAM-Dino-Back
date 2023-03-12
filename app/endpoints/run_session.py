@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, Query
 from uuid import uuid1
 from random import Random
 from datetime import datetime
@@ -36,10 +36,10 @@ async def drop_user(room_id, user_id):
 
 
 @run_router.websocket('/run')
-async def connect_to_run(connection: WebSocket):
+async def connect_to_run(connection: WebSocket, uid: str = Query(default=None)):
     global current_room
     await connection.accept()
-    connection_id = uuid1()
+    connection_id = uid
     connections[connection_id] = {"conn": connection, "room": current_room}
 
     runs[current_room]["users"].append(
@@ -51,13 +51,17 @@ async def connect_to_run(connection: WebSocket):
 
     try:
         while True:
-            data = await connection.receive_text()
+            data = await connection.receive_json()
 
-        #     for i in range(len(runs['1'])):
-        #         await runs['1'][i].send_text(f"Message text was: {data}")
+            if (data["action"] == "user_dies"):
+                user["alive"] = False
+                user["reason"] = "DIE"
+                room_id = connections[connection_id]["room"]
+                await drop_user(room_id, connection_id)
+                break
+
     except Exception as e:
         room_id = connections[connection_id]["room"]
-        del connections[connection_id]
 
         user = [x for x in runs[room_id]["users"]
                 if x["conn"] == connection_id][0]
@@ -65,4 +69,7 @@ async def connect_to_run(connection: WebSocket):
             runs[room_id].remove(user)
         else:
             user["alive"] = False
+            user["reason"] = "DISCONNECETD"
             await drop_user(room_id, connection_id)
+
+        del connections[connection_id]

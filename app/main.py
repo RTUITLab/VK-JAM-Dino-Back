@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .db import db
 from .endpoints.run_session import run_router
+from .endpoints.user import user_router
 
 app = FastAPI()
 
@@ -15,9 +16,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    print('asdas')
-    return {"Hello": 'Dino'}
-
 app.include_router(run_router)
+app.include_router(user_router)

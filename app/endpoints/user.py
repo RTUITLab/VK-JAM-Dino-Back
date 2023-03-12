@@ -7,7 +7,7 @@ from ..models.user import User
 user_router = APIRouter()
 
 
-@user_router.get('/user', response_model=User)
+@user_router.get('/user', response_model=User, tags=['user'])
 async def getUser(uid: str = Query(default=None)):
     user = db.users.find_one({"uid": uid})
     user["_id"] = ''
@@ -17,7 +17,7 @@ async def getUser(uid: str = Query(default=None)):
         return status.HTTP_404_NOT_FOUND
 
 
-@user_router.post('/user')
+@user_router.post('/user', tags=['user'])
 async def createUser(user: User):
     user = db.users.find_one({"uid": user.uid})
     if user != None:

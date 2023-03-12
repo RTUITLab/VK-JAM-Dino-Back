@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .db import db
-from .endpoints.run_session import run_router
+# from .endpoints.run_session import run_router
+from .endpoints.run import run_router
 from .endpoints.user import user_router
 
 app = FastAPI()

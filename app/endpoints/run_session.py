@@ -17,10 +17,11 @@ run_router = APIRouter()
 
 
 async def start_run(room_id):
+    seed = rand.randint(1, 900)
     for user in runs[room_id]["users"]:
         connection = connections[user["conn"]]
         if user["alive"]:
-            await connection["conn"].send_json({"action": "start", "body": {"seed": rand.randint(1, 900)}})
+            await connection["conn"].send_json({"action": "start", "body": {"seed": seed}})
 
     runs[current_room]["started"] = datetime.now()
 

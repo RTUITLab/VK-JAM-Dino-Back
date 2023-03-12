@@ -6,5 +6,5 @@ class Run(BaseModel):
     user_id: str
     score: int
     level: int = 0
-    seed: int = 0
+    seed: str = ''
     killer: str = ''
